@@ -1,0 +1,331 @@
+#!/usr/bin/env python
+
+import os
+
+from time import sleep
+from argparse import ArgumentParser, SUPPRESS
+from shutil import get_terminal_size
+from random import choice
+
+
+class MyParser(ArgumentParser):
+    def error(self, message):
+        self.tui = TUI()
+        self.tui.clear()
+        self.tui.show_title()
+        if message != "":
+            self.tui.center_error(f"{message}")
+        self.tui.draw_line()
+        self.tui.message("Here's some help for you:")
+        print()
+        self.print_help()
+        print()
+        exit(1)
+
+
+class Colors:
+    res = "\033[0m"
+    red = "\033[31;1m"
+    gre = "\033[32;1m"
+    yel = "\033[33;1m"
+    blu = "\033[34;1m"
+    pin = "\033[35;1m"
+    cya = "\033[36;1m"
+    whi = "\033[37;1m"
+
+
+class TUI:
+    def __init__(self):
+        self.title = " DLer v3.0 "
+        self.cols = get_terminal_size().columns
+        self.color = Colors()
+
+    def show_title(self, title=""):
+        yel = self.color.yel
+        res = self.color.res
+
+        if title == "":
+            title = self.title
+        char = "─"
+        line = ((self.cols - len(title)) // 2) * char
+        print(f"{yel}{line}{res}{title}{yel}{line}{res}")
+
+    def all_done(self):
+        lines = [
+            "Thanks for using DLer. Cheers!",
+            "Trans Rights Are Human Rights!",
+            "Life needs things to live",
+        ]
+        msg = choice(lines)
+        self.message("All done.")
+        self.draw_line()
+        print(msg)
+        exit()
+
+    def draw_line(self):
+        yel = self.color.yel
+        res = self.color.res
+        char = "─"
+        x = 0
+        line = (get_terminal_size().columns - x) * char
+        print(f"{yel}{line}{res}")
+
+    def shorten_string(self, message):
+        # --- 43 is the full length of a YouTube URI
+        if len(message) > 43:
+            return message[:43] + "..."
+        else:
+            return message
+
+    def clear(self):
+        os.system("clear")
+
+    def center_message(self, msg):
+        col = self.color.gre
+        res = self.color.res
+        spaces = ((get_terminal_size().columns - len(msg)) // 2) * " "
+        print(f"{spaces}{col}{msg}{res}")
+
+    def center_error(self, msg):
+        col = self.color.red
+        res = self.color.res
+        spaces = ((get_terminal_size().columns - len(msg)) // 2) * " "
+        print(f"{spaces}{col}{msg}{res}")
+
+    def message(self, msg):
+        col = self.color.gre
+        res = self.color.res
+        print(f"{col}>>{res} {msg}")
+
+    def error(self, msg):
+        col = self.color.red
+        res = self.color.res
+        print(f"{col}>>{res} {msg}")
+
+    def warning(self, msg):
+        col = self.color.yel
+        res = self.color.res
+        print(f"{col}>>{res} {msg}")
+
+    def info(self, msg):
+        col = self.color.cya
+        res = self.color.res
+        print(f"{col} >{res} {msg}")
+
+    def important(self, msg):
+        col = self.color.pin
+        res = self.color.res
+        print(f"   {col}{msg}{res}")
+
+    def step(self, msg):
+        col = self.color.blu
+        res = self.color.res
+        print(f"{col} -{res} {msg}")
+
+
+class FileIO:
+    def __init__(self):
+        self.cwd = os.getcwd()
+
+    def read_file(self, filename):
+        path = os.path.join(self.cwd, filename)
+        with open(path, "r") as f:
+            data = f.read().splitlines()
+        return data
+
+    def remove(self, filename):
+        path = os.path.join(self.cwd, filename)
+        os.remove(path)
+
+    def check_if_file_exists(self, filename):
+        path = os.path.join(self.cwd, filename)
+        if os.path.exists(path):
+            return True
+        else:
+            return False
+
+
+class DLer:
+    def __init__(self):
+        # ---- declare booleans
+        self.quiet = False
+        self.keep_lists = False
+        self.download_as_audio = False
+        self.download_subtitles = False
+
+        # ---- link classes
+        self.color = Colors()
+        self.tui = TUI()
+        self.fileio = FileIO()
+
+        # ---- declare integers / floats
+        self.total_files = 0
+
+        # ---- declare strings
+        self.archive = "done.txt"
+        self.keep_lists_string = "Keeping the lists."
+        self.no_output_string = "Hiding 'yt-dlp' output."
+        self.generate_command_string = "Generating list of commands ..."
+        self.execute_commands_string = "Executing commands ..."
+
+    def generate_command(self, url):
+        cmd = f"yt-dlp --no-warning --download-archive {self.archive} "
+
+        if self.quiet:
+            cmd += "--quiet "
+
+        if self.download_as_audio:
+            cmd += "-x "
+
+        if self.download_subtitles:
+            cmd += "--sub-lang en "
+            cmd += "--sub-format vtt "
+            cmd += "--write-subs "
+        cmd += url
+        return cmd
+
+    def process_list(self, numfile, filename, data):
+        total = len(data)
+        bar_empty = "─"
+        bar_full = "≡"
+
+        status_bar_clean = 10 * bar_empty
+        yel = self.color.yel
+        gre = self.color.gre
+        cya = self.color.cya
+        res = self.color.res
+
+        for c, item in enumerate(data):
+            percentage = round(((c + 1) / total) * 100)
+            num_done = int(percentage / len(status_bar_clean))
+            num_left = len(status_bar_clean) - num_done
+            status_done = num_done * bar_full
+            status_left = num_left * bar_empty
+            status_bar = f"{gre}{status_done}{yel}{status_left}{res}"
+            # status_bar = f"{status_done}{status_left}"
+
+            self.tui.clear()
+            self.tui.show_title()
+            self.tui.message(
+                f"Parsing file {cya}{filename}{res} ({numfile:2}/{self.total_files:2})"
+            )
+            self.tui.step(self.generate_command_string)
+            self.tui.step(self.execute_commands_string)
+            itemname = self.tui.shorten_string(item)
+            self.tui.warning(
+                f"Processing {c + 1:3}/{total:3} [{status_bar} {percentage:3}%] {itemname}"
+            )
+
+            if self.download_as_audio and self.download_subtitles:
+                self.tui.error("Can't download subtitles for audio files.")
+                self.tui.info("Disabling subtitles for all downloads.")
+                self.download_subtitles = False
+
+            if self.keep_lists:
+                self.tui.info(self.keep_lists_string)
+
+            if self.quiet:
+                self.tui.info(self.no_output_string)
+
+            cmd = self.generate_command(item)
+            self.tui.draw_line()
+            if not self.quiet:
+                print()
+            os.system(cmd)
+            sleep(2)
+
+        # ---- Remove the parsed file
+        self.tui.clear()
+        self.tui.show_title()
+        self.tui.message(f"Parsing file '{filename}' ({numfile}/{self.total_files})")
+
+        self.tui.step(self.generate_command_string)
+        self.tui.step(self.execute_commands_string)
+
+        status_done = len(status_bar_clean) * bar_full
+        status_bar = f"{gre}{status_done}{res}"
+        percentage = 100
+        self.tui.warning(
+            f"Processing {total:3}/{total:3} [{status_bar} {percentage:3}%]"
+        )
+
+        if self.keep_lists:
+            self.tui.info(self.keep_lists_string)
+        if self.quiet:
+            self.tui.info(self.no_output_string)
+
+        if not self.keep_lists:
+            self.tui.step(f"Deleting '{filename}'")
+            self.fileio.remove(filename)
+            sleep(1.2)
+
+    def run(self, items):
+        self.total_files = len(items)
+        for c, item in enumerate(items):
+            if self.fileio.check_if_file_exists(item):
+                data = self.fileio.read_file(item)
+                self.process_list(c + 1, item, data)
+            else:
+                self.tui.clear()
+                self.tui.show_title()
+                self.tui.error(f"File '{item}' doesn't seem to exist!")
+                sleep(2)
+
+        if not self.keep_lists:
+            self.tui.step("Deleting download archive")
+            if self.fileio.check_if_file_exists(self.archive):
+                self.fileio.remove(self.archive)
+            sleep(1.2)
+        self.tui.all_done()
+
+
+if __name__ == "__main__":
+    dler = DLer()
+
+    parser = MyParser(add_help=False)
+    required = parser.add_argument_group("Required arguments")
+    optional = parser.add_argument_group("Optional arguments")
+
+    optional.add_argument(
+        "-h",
+        "--help",
+        action="help",
+        default=SUPPRESS,
+        help="show this help message and exit",
+    )
+
+    optional.add_argument(
+        "-k", "--keep", help="Keep the lists after completion.", action="store_true"
+    )
+
+    optional.add_argument(
+        "-q", "--quiet", help="Suppress yt-dlp output.", action="store_true"
+    )
+
+    optional.add_argument(
+        "-a", "--audio", help="Download as audio only.", action="store_true"
+    )
+
+    optional.add_argument(
+        "-s", "--subs", help="Download subtitles (en/vtt).", action="store_true"
+    )
+
+    required.add_argument(
+        "-i", "--input", help="Textfile with urls to download", nargs="+", required=True
+    )
+
+    args = parser.parse_args()
+
+    if args.keep:
+        dler.keep_lists = True
+
+    if args.quiet:
+        dler.quiet = True
+
+    if args.audio:
+        dler.download_as_audio = True
+
+    if args.subs:
+        dler.download_subtitles = True
+
+    dler.run(args.input)

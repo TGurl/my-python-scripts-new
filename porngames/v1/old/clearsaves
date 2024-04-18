@@ -1,0 +1,123 @@
+#!/usr/bin/env python
+
+import os
+from time import sleep
+from shutil import rmtree
+from pathlib import Path
+
+
+class Colors:
+    reset = "\033[0m"
+    black = "\033[30m"
+    red = "\033[31m"
+    green = "\033[32m"
+    yellow = "\033[33m"
+    blue = "\033[34m"
+    pink = "\033[35m"
+    cyan = "\033[36m"
+    white = "\033[37m"
+
+
+class ClearSaves:
+    def __init__(self):
+        self.colors = Colors()
+        self.DEBUG = False
+        self.paths = []
+        self.names = []
+        self.has_content = False
+        self.path = os.path.join(
+            os.path.expanduser("~"),
+            ".renpy"
+        )
+
+    def header(self, msg):
+        cya = self.colors.cyan
+        yel = self.colors.yellow
+        res = self.colors.reset
+
+        msg = f" {msg} "
+        os.system('clear')
+        line = len(msg) * "-"
+        print(f"{cya}{line}{res}")
+        print(f"{yel}{msg}{res}")
+        print(f"{cya}{line}{res}")
+
+    def get_folders(self):
+        subfolders = [
+            f.path for f in os.scandir(self.path) if f.is_dir()
+        ]
+        for folder in subfolders:
+            name = folder.split("/")[-1]
+            if name != 'persistent':
+                self.names.append(name)
+                self.paths.append(folder)
+        self.names.sort()
+        self.paths.sort()
+
+        if len(self.names) > 0:
+            self.has_content = True
+
+    def show_menu(self):
+        self.header("Ren'py Saves Clearer")
+        valid = ['a', 'q', 'all', 'quit']
+        if self.DEBUG:
+            print("------------------------")
+            print(self.names)
+            print("------------------------")
+            print()
+        if self.has_content:
+            print("[A ] Remove all folders", end="\n\n")
+            for num, name in enumerate(self.names):
+                count = str(num + 1)
+                valid.append(count)
+                print(f"[{count:2}] {name}")
+            print()
+        else:
+            print("There are no saves to remove...")
+            exit()
+        print("[Q ] Quit", end="\n\n")
+        answer = input("Delete : ").lower()
+        if answer not in valid:
+            print("That is not an option...")
+        else:
+            return answer
+
+    def do_remove(self, path):
+        if Path(path).is_file():
+            Path(path).unlink()
+        elif Path(path).is_dir():
+            rmtree(path)
+
+    def remove_all(self):
+        for num, _ in enumerate(self.names):
+            self.remove_one_folder(num)
+
+    def remove_one_folder(self, num):
+        num = int(num) - 1
+        self.header(f"Removing {self.names[num]}")
+        self.do_remove(self.paths[num])
+        sleep(1)
+
+    def run(self):
+        running = True
+        while running:
+            self.get_folders()
+            if not self.has_content:
+                running = False
+            answer = self.show_menu()
+            if answer in ['q', 'quit']:
+                running = False
+            elif answer in ['a', 'all']:
+                self.remove_all()
+            else:
+                self.remove_one_folder(answer)
+
+            # reset all just to be sure
+            self.names = []
+            self.paths = []
+            self.has_content = False
+
+
+if __name__ == "__main__":
+    app = ClearSaves()
+    app.run()

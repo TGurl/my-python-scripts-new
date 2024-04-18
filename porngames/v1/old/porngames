@@ -1,0 +1,185 @@
+#!/usr/bin/env python
+
+import os
+import fnmatch
+import py7zr
+from time import sleep
+
+
+class Colors:
+    reset = "\033[0m"
+    black = "\033[30m"
+    red = "\033[31m"
+    green = "\033[32m"
+    yellow = "\033[33m"
+    blue = "\033[34m"
+    pink = "\033[35m"
+    cyan = "\033[36m"
+    white = "\033[37m"
+
+
+class GameMenu:
+    def __init__(self):
+        self.colors = Colors()
+        self.debug = False
+        self.gamepath = os.path.join(
+            '/data',
+            'downloads',
+            'SexGames'
+        )
+        self.destdir = os.path.join(
+            os.path.expanduser('~'),
+            'Games'
+        )
+        self.zips = self.scan_zips()
+        self.zips.sort()
+        self.running = True
+        self.total_games = len(self.zips)
+        self.start_page = 0
+        self.start = 0
+        self.offset = 10  # Items per page
+        self.total_pages = self.ceil(self.total_games / self.offset)
+        self.last_offset = self.total_games % self.offset
+
+    def ceil(self, n):
+        return int(-1 * n // 1 * -1)
+
+    def floor(self, n):
+        return int(n // 1)
+
+    def get_size(self, path):
+        size = os.path.getsize(path)
+        if size < 1024:
+            return f"{size} bytes"
+        elif size < 1024*1024:
+            return f"{round(size/1024, 2)} KiB"
+        elif size < 1024*1024*1024:
+            return f"{round(size/(1024*1024), 2)} MiB"
+        elif size < 1024*1024*1024*1024:
+            return f"{round(size/(1024*1024*1024), 2)} GiB"
+
+    def scan_zips(self):
+        return fnmatch.filter(
+            os.listdir(self.gamepath),
+            "*.7z"
+        )
+
+    def extract_zip(self, idx):
+        res = self.colors.reset
+        yel = self.colors.yellow
+        gre = self.colors.green
+        blu = self.colors.blue
+        cya = self.colors.cyan
+
+        zipfile = os.path.join(
+            self.gamepath,
+            self.zips[idx]
+        )
+        name = self.zips[idx]
+        filesize = self.get_size(zipfile)
+
+        self.header("Extracting 7z archive", show_info=False)
+        print(f"{gre}>> {cya}Extracting : {yel}{name}{res}")
+        print(f"{gre}>> {cya}Size       : {blu}{filesize}{res}")
+        print(f"{gre}>> {cya}Please wait...{res}")
+        szfile = py7zr.SevenZipFile(zipfile, mode='r')
+        szfile.extractall(path=self.destdir)
+        szfile.close()
+
+    def header(self, message, show_info=True):
+        if not self.debug:
+            os.system('clear')
+        cya = self.colors.cyan
+        yel = self.colors.yellow
+        res = self.colors.reset
+        msg = f" {message} "
+        line = len(msg) * "─"
+        print(f" {cya}┌{line}┐")
+        print(f" │{yel}{msg}{cya}│")
+        print(f" └{line}┘{res}")
+        if show_info:
+            print()
+            print(f" {cya}Select a game to install{res}")
+            print()
+
+    def show_debug_info(self):
+        os.system('clear')
+        print(45 * "-")
+        print(f"--> total zips: {self.total_games}")
+        print(f"--> total pages: {self.total_pages}")
+        print(f"--> start page: {self.start_page}")
+        print(f"--> count: {self.start}")
+        print(f"--> showing: {self.start} -> {self.start + self.offset}")
+        print(f"--> on last page: {self.last_offset}")
+        print(45 * "-")
+
+    def generate_page(self, page, show_until):
+        # Generate the page list
+        for idx in range(self.start, show_until):
+            page.append(self.zips[idx])
+
+        if len(page) == 0:
+            self.start = self.total_games - self.offset
+            show_until = self.total_games
+            page = self.generate_page(page, show_until)
+
+        return page
+
+    def run(self):
+        cya = self.colors.cyan
+        yel = self.colors.yellow
+        blu = self.colors.blue
+        red = self.colors.red
+        res = self.colors.reset
+
+        while self.running:
+            page = []
+            if self.start < 0:
+                self.start = 0
+
+            show_until = self.start + self.offset
+            if show_until == self.total_games:
+                show_until = self.total_games
+            elif show_until > self.total_games:
+                self.start = self.total_games - self.last_offset
+                show_until = self.start + self.last_offset
+
+            page = self.generate_page(page, show_until)
+
+            if self.debug:
+                self.show_debug_info()
+
+            self.header("Simple Game Installer")
+
+            valid = ['q', 'quit', 'n', 'next', 'p', 'prev', 'previous']
+
+            for idx, name in enumerate(page):
+                num = self.zips.index(name)
+                name = name.replace("_", " ").split('.')[0]
+                print(f"{cya}[{yel}{num+1:3}{cya}]{res} {name}")
+                valid.append(str(num+1))
+
+            print()
+            print(f"({cya}p{res})revious ({cya}n{res})ext ({red}q{res})uit")
+            print()
+            answer = input(f"{blu}>{res} ").lower()
+            if answer not in valid:
+                print(f"{red}>>{res} That is not an option")
+                sleep(2)
+            elif answer in ['q', 'quit']:
+                self.running = False
+            elif answer in ['n', 'next']:
+                self.start += self.offset
+            elif answer in ['p', 'prev', 'previous']:
+                self.start -= self.offset
+            else:
+                self.extract_zip(int(answer) - 1)
+
+        if self.debug:
+            os.system('clear')
+        self.header("Thanks for playing!", show_info=False)
+
+
+if __name__ == "__main__":
+    app = GameMenu()
+    app.run()

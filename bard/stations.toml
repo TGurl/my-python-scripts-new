@@ -1,0 +1,9 @@
+stations = [
+  { name = "Lofi Girl", stream_id = "jfKfPfyJRdk" },
+  { name = "Chillhop Radio - jazzy & lofi hip hop beats", stream_id = "5yx6BWlEVcY" },
+  { name = "Lofi Hip Hop Beats 24/7 Radio", stream_id = "IRp0zhUFi-M" },
+  { name = "Coffee Shop Radio", stream_id = "lP26UCnoH9s" },
+  { name = "Relaxing Jazz Piano Radio",stream_id =  "Dx5qFachd3A" },
+  { name = "Coffee Jazz Music", stream_id = "fEvM-OUbaKs" },
+  { name = "Night Jazz New York", stream_id = "aixaT5NjGo8" }
+]
