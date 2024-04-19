@@ -188,7 +188,12 @@ class Puta(TransgirlUtils):
         if check != '':
             cfolder = check.replace('/' + arc_name, '')
             self.show_title(appname=self.appname, width=self.appwidth)
-            self.error_message(f"{arc_name} already exists in {cfolder}.\n ")
+            self.error_message(f"{arc_name} already exists in {cfolder}.")
+            answer = self.ask_yes_no('Do you want me to delete it?')
+            if answer:
+                os.remove(os.path.join(cfolder, arc_name))
+                self.default_message(f"{arc_name} removed from collection")
+                sleep(1.5)
 
         #if os.path.exists(destination):
         #    self.show_title(appname=self.appname, width=self.appwidth)

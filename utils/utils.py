@@ -68,19 +68,24 @@ class TransgirlUtils:
     def error_message(self, message, dot='·'):
         self.printr(f"%r{dot}%R {message}")
     
-    def ask_yes_no(self, message, dot='·'):
-        msg = self.colorize(f"%g{dot}%R {message} (y/n) : ")
-        keypressed = False
-        key = ''
-        while not keypressed:
-            print(msg, end='', flush=True)
-            key = readchar.readchar().lower()
-            if key not in 'yn':
-                self.error_message("That was a wrong key, you slut!")
-                sleep(1.2)
+    def ask_yes_no(self, message, default_yes=True, dot='·'):
+        prompt = '(Y/n)' if default_yes else '(y/N)'
+        msg = self.colorize(f"%g{dot}%R {message} {prompt} : ")
+
+        while True:
+            answer = input(msg).lower()
+            if answer not in ['y', 'yes', 'n', 'no', '']:
+                self.error_message("You pressed the wrong key, you cunt!")
+                sleep(1.5)
+                self.clear_lines()
             else:
-                keypressed = True
-        return True if key == 'y' else False
+                if answer == '' and default_yes:
+                    answer = 'y'
+                else:
+                    answer = 'n'
+                break
+
+        return True if answer == 'y' else False
 
     def warning_message(self, message, dot='·'):
         self.printr(f"%y{dot}%R {message}")
@@ -90,7 +95,8 @@ class TransgirlUtils:
 
     def show_title(self, appname='APPNAME HERE', width=0, clear_screen=True):
         if not appname:
-            self.error_message('No appname has been supplied.', exit_app=True)
+            self.error_message('No appname has been supplied.')
+            sys.exit()
 
         if not width:
             width = self.twidth
