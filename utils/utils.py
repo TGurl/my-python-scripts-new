@@ -1,8 +1,7 @@
-#!/usr/bin/env python
 import os
 import sys
-import shutil
-import readchar
+# import shutil
+# import readchar
 import datetime
 import random
 import string
@@ -33,6 +32,9 @@ class TransgirlUtils:
                    'I want to suck a huge =====)',
         ]
         return random.choice(slogans)
+
+    def get_fucked(self, seconds=2.5):
+        time.sleep(seconds)
 
     def colorize(self, text, remove_colors=False):
         for color in Colors.colors:

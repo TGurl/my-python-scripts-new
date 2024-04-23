@@ -1,5 +1,5 @@
 FLAG = --onefile
-APPNAME = wp
+APPNAME = girltube
 
 install: build move clean
 

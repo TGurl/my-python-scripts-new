@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 class Colors:
     reset = "\033[0m"
     black = "\033[30;1m"

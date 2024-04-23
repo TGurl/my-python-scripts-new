@@ -1,5 +1,5 @@
 FLAG = --onefile
-APPNAME = girltube
+APPNAME = initpy
 
 install: build move clean
 
@@ -19,4 +19,4 @@ uninstall:
 	@rm ~/.bin/$(APPNAME)
 
 edit:
-	nvim -p main.py girltubecore.py utils.py colors.py
+	nvim -p main.py utils.py colors.py

@@ -75,20 +75,17 @@ class Storyteller(TransgirlUtils):
             sleep(1.5)
             self.clear_lines()
         new_story_content = [
-                f'# {story_title.upper()}\n',
+                f'# {story_title.title()}\n',
                 '_an erotic tale by Transgirl_\n\n',
-                '## Disclaimer\n',
-                'This is a work of fiction. Any resemblance to any person living or dead is\n',
-                'purely coincidental. All characters are presumed to be of legal age unless\n',
-                'indicated otherwise. It is always assumed all characters consent to everything\n',
-                'they do.\n\n',
-                'The country where all my stories take place may resemble the United States,\n',
-                "but is only loosely based on it. I've taken the liberty of adding a lot of\n",
-                'European influences into it.\n\n'
-                '## Chapter One\n'
+                '---\n\n',
+                '_This is a work of fiction. Any resemblance to any person living or dead is_\n',
+                '_purely coincidental. All characters are presumed to be of legal age. It is_\n',
+                '_also presumed all sexual acts are consensual and/or legal._\n\n',
+                '---\n\n',
+                '## Chapter One\n\n'
                 ]
         new_notes_content = [
-                f'# NOTES FOR {story_title.upper()}\n\n',
+                f'# Notes For {story_title.title()}\n\n',
                 'place your story notes here...\n'
                 ]
         story_file = story_title.lower().replace(' ', '_') + '.md'
