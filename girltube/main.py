@@ -8,11 +8,14 @@ class GirlTube(GirlTubeCore):
         super().__init__()
 
     def run(self, args):
+        self.unlock = args.unlock
         self.check_lock()
         self.lock_girltube()
         self.preflight_check()
         self.start_oldest = not args.latest
         self.continue_last = args.continuelast
+        self.start_small = args.small
+        self.fullscreen = args.fullscreen
 
         if args.add:
             self.add_youtube_url_to_db()
@@ -28,6 +31,8 @@ if __name__ == "__main__":
     app=GirlTube()
 
     parser = argparse.ArgumentParser(prog='girltube')
+
+    egroup = parser.add_mutually_exclusive_group(required=False)
 
     parser.add_argument('-a', '--add',
                         action='store_true',
@@ -48,5 +53,19 @@ if __name__ == "__main__":
                         action='store_true',
                         required=False,
                         help='continue last watched')
+
+    parser.add_argument('-u', '--unlock',
+                        action='store_true',
+                        required=False,
+                        help='unlock girltube')
+
+    egroup.add_argument('-s', '--small',
+                        action='store_true',
+                        help='start in a small window')
+
+    egroup.add_argument('-fs', '--fullscreen',
+                        action='store_true',
+                        help='start fullscreen')
+
 
     app.run(parser.parse_args())

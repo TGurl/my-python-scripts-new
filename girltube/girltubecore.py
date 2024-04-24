@@ -15,6 +15,9 @@ class GirlTubeCore(TransgirlUtils):
         self.lock_file = os.path.join(self.base_dir, 'girltube.lock')
         self.start_oldest = True
         self.continue_last = False
+        self.start_small = False
+        self.unlock = False
+        self.fullscreen = False
 
     def preflight_check(self):
         if not os.path.exists(self.base_dir):
@@ -30,10 +33,12 @@ class GirlTubeCore(TransgirlUtils):
             os.remove(self.lock_file)
 
     def check_lock(self):
-        if os.path.exists(self.lock_file):
+        if os.path.exists(self.lock_file) and not self.unlock:
             self.girltube_banner(slogan=False)
             self.error_message('There already is an instance of %rGirlTube%R running...')
             sys.exit()
+        else:
+            self.unlock_girltube()
 
     def reverse_m3u_list(self, path):
         data = self.read_file(path)
@@ -50,7 +55,13 @@ class GirlTubeCore(TransgirlUtils):
             self.default_message('Starting with last video first...')
             self.reverse_m3u_list(m3u_list)
 
-        cmd = f"mpv --really-quiet -loop-playlist --playlist={m3u_list} --volume=75"
+        options = f"--really-quiet -loop-playlist --playlist={m3u_list} --volume=75"
+        geometry = ''
+        if not self.fullscreen:
+            geometry = '--geometry=600x338 --ontop --ontop-level=window ' if self.start_small else ''
+        fullscreen = '--fs' if self.fullscreen else ''
+
+        cmd = f"mpv {options} {fullscreen} {geometry}"
         os.system(cmd)
 
         if self.continue_last and not self.start_oldest:
@@ -85,6 +96,12 @@ class GirlTubeCore(TransgirlUtils):
 
         is_playlist = self.check_if_playlist(youtube_url)
         i = Playlist(youtube_url) if is_playlist else Channel(youtube_url)
+        t = i.title if is_playlist else i.channel_name
+
+        if is_playlist:
+            self.default_message(f"Playlist: {t}")
+        else:
+            self.default_message(f"Channel: {t}")
 
         vods = list(i.video_urls)
         if self.start_oldest:
@@ -109,8 +126,40 @@ class GirlTubeCore(TransgirlUtils):
             self.cprint(self.random_slogan(), width=65, new_line=True)
 
     def delete_youtube_url(self):
-        cmd = f"nvim {self.youtube_urls}"
-        os.system(cmd)
+        exit_menu = False
+        while not exit_menu:
+            data = self.read_file(self.youtube_urls)
+
+            owners = []
+            for line in data:
+                title, _ = self.split_line(line)
+                owners.append(title)
+            owners.sort()
+
+            owner_list = FzfPrompt().prompt(owners, '--reverse --exact --multi')
+
+            if owner_list == []:
+                self.unlock_girltube()
+                self.girltube_banner()
+                self.default_message('All done?')
+                sys.exit()
+
+            for owner in owner_list:
+                line_to_remove = ''
+                for line in data:
+                    if owner in line:
+                        line_to_remove = line
+                        break
+
+                line_to_remove = line_to_remove.strip()
+
+                with open(self.youtube_urls, 'r+') as f:
+                    d = f.readlines()
+                    f.seek(0)
+                    for i in d:
+                        if i != line_to_remove + '\n':
+                            f.write(i)
+                    f.truncate()
 
     def add_youtube_url_to_db(self):
         while True:
@@ -127,6 +176,9 @@ class GirlTubeCore(TransgirlUtils):
 
             if '/videos' in new_url:
                 new_url = new_url.replace('/videos', '')
+
+            # -- remove leading and/or trailing whitespaces
+            new_url = new_url.strip()
 
             found = False
             for line in data:
