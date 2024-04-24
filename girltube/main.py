@@ -8,6 +8,8 @@ class GirlTube(GirlTubeCore):
         super().__init__()
 
     def run(self, args):
+        self.check_lock()
+        self.lock_girltube()
         self.preflight_check()
         self.start_oldest = not args.latest
         self.continue_last = args.continuelast
@@ -15,7 +17,11 @@ class GirlTube(GirlTubeCore):
         if args.add:
             self.add_youtube_url_to_db()
 
+        if args.delete:
+            self.delete_youtube_url()
+
         self.channel_switcher()
+        self.unlock_girltube()
 
 
 if __name__ == "__main__":
@@ -27,6 +33,11 @@ if __name__ == "__main__":
                         action='store_true',
                         required=False,
                         help='add stuff')
+
+    parser.add_argument('-d', '--delete',
+                        action='store_true',
+                        required=False,
+                        help='delete stuff')
 
     parser.add_argument('-l', '--latest',
                         action='store_true',
