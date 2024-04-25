@@ -20,6 +20,7 @@ class TransgirlUtils:
 
     def initialize(self):
         self.twidth = os.get_terminal_size().columns
+        self.always_yes = False
 
     def random_slogan(self):
         slogans = ['I want to have my own b(.)(.)bs!',
@@ -95,8 +96,15 @@ class TransgirlUtils:
     def default_message(self, message, dot='·', new_line=False):
         self.printr(f"%g{dot}%R {message}", new_line=new_line)
 
+    def main_step(self, message, dot='==>', new_line=False):
+        self.printr(f"%g{dot}%R {message}", new_line=new_line)
+
+    def sub_step(self, message, dot='-->', new_line=False, spaces=4):
+        sp = spaces * ' '
+        self.printr(f"{sp}%b{dot}%R {message}", new_line=new_line)
+
     def show_title(self, appname='APPNAME HERE', width=0, clear_screen=True):
-        if not appname:
+        if appname == 'APPNAME HERE':
             self.error_message('No appname has been supplied.')
             sys.exit()
 
@@ -208,38 +216,44 @@ class TransgirlUtils:
         start_time = time.time()
         archive_name = path + ".zip"
         if os.path.exists(archive_name):
-            self.error_message(f"File %i{archive_name}%R already exists. Removed it.", exit_app=False)
             os.remove(archive_name)
         data = glob.glob(os.path.join(path, "**"), recursive=True)
         total = len(data)
         perc = 0
+        self.main_step(f"Zipping %i{archive_name}%R")
         with ZipFile(archive_name, 'w', compresslevel=9, compression=compresstype) as archive:
             for idx, entry in enumerate(data, start=0):
                 perc = idx * 100 // total
                 fn = self.shorten_string(entry, width=length - 7)
-                self.warning_message(f"[{perc:3}%] adding {fn}", dot='>>')
+                self.sub_step(f"[{perc:3}%] adding {fn}")
                 archive.write(entry)
                 self.clear_lines()
+        self.clear_lines()
         size = self.convert_size(os.stat(archive_name).st_size)
         self.default_message(f"The size of {archive_name} is {size}.")
         time_taken = round(time.time() - start_time, 2)
         self.default_message(f"Archiving took {time_taken} seconds.")
 
     def unzipper(self, path, target_folder, length=45):
+        size = self.convert_size(os.stat(path).st_size)
+        filename = path.split('/')[-1]
+        self.main_step(f"Unzipping %i{filename} ({size})%R...", dot='-')
         with ZipFile(path, 'r') as archive:
             filelist = archive.infolist()
             total = len(filelist)
             for i, item in enumerate(filelist, start=0):
                 perc = i * 100 // total
                 fn = self.shorten_string(item.filename, width=length)
-                action = 'inflating' if item.is_dir() else 'creating'
-                self.warning_message(f"[{perc:3}%] {action} {fn}", dot='>>')
+                action = 'creating' if item.is_dir() else 'inflating'
+                self.sub_step(f"[{perc:3}%] {action} {fn}", spaces=2)
                 extracted_path = archive.extract(item, target_folder)
                 if item.create_system == 3:
                     unix_attr = item.external_attr >> 16
                     if unix_attr:
                         os.chmod(extracted_path, unix_attr)
                 self.clear_lines()
+        self.clear_lines()
+        self.default_message(f"Unzipping %i{filename} ({size})%R done.", dot='✓')
 
     # -- keep this one last because of stupid editor thingie
     def clear_lines(self, number=1):

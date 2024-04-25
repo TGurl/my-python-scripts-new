@@ -164,10 +164,12 @@ class GirlTubeCore(TransgirlUtils):
     def add_youtube_url_to_db(self):
         while True:
             data = self.import_data()
+            total = len(data)
 
             self.girltube_banner()
             self.printr('%wWelcome to %rGirlTube.%R Please enter the url you want to add.')
             self.printr('Just leave it empty to exit this menu.', new_line=True)
+            self.printr(f'Total links collected : {total}', new_line=True)
             prompt = self.colorize('%r>%g>%y>%R ')
             new_url = input(prompt)
 
