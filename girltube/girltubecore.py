@@ -95,8 +95,12 @@ class GirlTubeCore(TransgirlUtils):
         self.check_if_playlist(youtube_url)
 
         is_playlist = self.check_if_playlist(youtube_url)
-        i = Playlist(youtube_url) if is_playlist else Channel(youtube_url)
-        t = i.title if is_playlist else i.channel_name
+        if is_playlist:
+            i = Playlist(youtube_url)
+            t = i.title
+        else:
+            i = Channel(youtube_url)
+            t = i.channel_name
 
         if is_playlist:
             self.default_message(f"Playlist: {t}")
@@ -104,7 +108,7 @@ class GirlTubeCore(TransgirlUtils):
             self.default_message(f"Channel: {t}")
 
         vods = list(i.video_urls)
-        if self.start_oldest:
+        if self.start_oldest or 'etho plays minecraft' in t.lower():
             vods.reverse()
 
         total = len(vods)
