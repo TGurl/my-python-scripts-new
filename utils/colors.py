@@ -12,7 +12,6 @@ class Colors:
     gray = "\033[37m"
     italic = "\x1B[3m"
 
-    codes = ['%R', '%B', '%G', '%r', '%g', '%dg', '%y', '%b', '%p', '%c', '%w', '%i']
     colors = [
             ('%R', reset),
             ('%B', black),
