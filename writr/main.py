@@ -75,7 +75,7 @@ class WriterCore():
     def header(self, title='Writr', cols=22):
         os.system('clear')
         self.draw_line()
-        self.printr(f'%y{title}%R', center=True, cols=22)
+        self.printr(f'%y{title}%R', center=True, cols=cols)
         self.draw_line()
 
     def check_keypress(self, allowed=[]):
@@ -119,12 +119,68 @@ class WriterCore():
         self.printr(f"%b>%g>%y>%w {name} %y<%g<%b<%R", newline=True)
         self.wait_for_enter()
 
+    def add_a_name(self, what='girl'):
+        prompt = self.colorize("%r>%y>%g>%R ")
+        title = f'Add a {what} name'
+        file = 'girlnames.lst' if what == 'girl' else 'boynames.lst'
+        path = os.path.join(self.localpath, file)
+        data = [line.strip() for line in open(path)]
+
+        self.header(title=title)
+        name = input(prompt).lower()
+        if not name:
+            return
+
+        found = False
+        for cname in data:
+            if name == cname.lower():
+                found = True
+                break
+
+        if found:
+            self.printr("%rKnown already%R")
+            sleep(1.5)
+        else:
+            with open(path, 'a', encoding='utf-8') as f:
+                f.write(name.title() + '\n')
+            self.printr(f"%gName {name.title()} added%R")
+            sleep(1.5)
+
+    def add_name_menu(self):
+        while True:
+            self.header(title='Add a name')
+            allowed = ['r']
+            nl = False
+            items = ['Add girlname', 'Add boyname', 'Return']
+            for idx, item in enumerate(items, start=1):
+                col = '%r' if item == 'Return' else '%g'
+                if idx == len(items) - 1:
+                    nl = True
+
+                if idx == len(items):
+                    keystr = 'r'
+                else:
+                    keystr = str(idx)
+                    allowed.append(str(idx))
+                self.printr(f"[{col}{keystr}%R] {item}", newline=nl)
+            prompt = self.colorize("%r>%y>%g>%R ")
+            print(prompt, end='', flush=True)
+            key = self.check_keypress(allowed=allowed)
+            print('')
+
+            if key == 'r':
+                break
+            elif key == '1':
+                self.add_a_name(what='girl')
+            elif key == '2':
+                self.add_a_name(what='boy')
+
     def main_menu(self):
         while True:
             self.header()
             allowed = ['q']
             nl = False
-            items = ['Girl name', 'Boy name', 'Translate', 'Quit']
+            items = ['Girl name', 'Boy name', 'Translate', 'Add a name', 'Quit']
             for idx, item in enumerate(items, start=1):
                 col = '%r' if item == 'Quit' else '%g'
                 if idx == len(items) - 1:
@@ -149,6 +205,8 @@ class WriterCore():
                 self.choose_name(girls=False)
             elif key == '3':
                 self.google_translate()
+            elif key == '4':
+                self.add_name_menu()
 
 
 class Writer(WriterCore):

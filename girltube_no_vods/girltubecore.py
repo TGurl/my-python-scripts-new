@@ -98,16 +98,23 @@ class GirlTubeCore(TransgirlUtils):
         if is_playlist:
             i = Playlist(youtube_url)
             t = i.title
+            vods = i.video_urls
         else:
             i = Channel(youtube_url)
             t = i.channel_name
+            vods = i.video_urls
+
+        _ = input(t)
 
         if is_playlist:
             self.default_message(f"Playlist: {t}")
         else:
             self.default_message(f"Channel: {t}")
 
-        vods = list(i.video_urls)
+        vods = list(vods)
+        print(vods)
+        _ = input('>ENTER<')
+
         if self.start_oldest or 'etho plays minecraft' in t.lower():
             vods.reverse()
 
@@ -121,6 +128,7 @@ class GirlTubeCore(TransgirlUtils):
                 m3u.write(url + '\n')
                 self.get_fucked(0.002)
                 self.clear_lines()
+        sys.exit()
         return m3u_path
 
     def girltube_banner(self, slogan=True):
@@ -203,9 +211,9 @@ class GirlTubeCore(TransgirlUtils):
                     title = i.title
                 else:
                     i = Channel(new_url)
-                    title = i.channel_name
+                    title = i.channel_id
 
-                line2add = f"{new_url},{title}\n"
+                line2add = f"{new_url},{title.strip()}\n"
                 with open(self.youtube_urls, 'a', encoding='utf-8') as f:
                     f.write(line2add)
 
@@ -241,7 +249,6 @@ class GirlTubeCore(TransgirlUtils):
                     self.clear_lines()
                     self.error_message("You didn't watch any videos yet, please do that first.")
                     sys.exit()
-
             self.movie_player(path)
             if self.continue_last:
                 break
