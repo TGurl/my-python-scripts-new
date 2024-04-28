@@ -103,17 +103,13 @@ class GirlTubeCore(TransgirlUtils):
             i = Channel(youtube_url)
             t = i.channel_name
             vods = i.video_urls
-
-        _ = input(t)
+        vods = list(vods)
 
         if is_playlist:
             self.default_message(f"Playlist: {t}")
         else:
             self.default_message(f"Channel: {t}")
 
-        vods = list(vods)
-        print(vods)
-        _ = input('>ENTER<')
 
         if self.start_oldest or 'etho plays minecraft' in t.lower():
             vods.reverse()
@@ -128,7 +124,6 @@ class GirlTubeCore(TransgirlUtils):
                 m3u.write(url + '\n')
                 self.get_fucked(0.002)
                 self.clear_lines()
-        sys.exit()
         return m3u_path
 
     def girltube_banner(self, slogan=True):
