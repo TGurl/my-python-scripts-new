@@ -206,7 +206,7 @@ class GirlTubeCore(TransgirlUtils):
                     title = i.title
                 else:
                     i = Channel(new_url)
-                    title = i.channel_id
+                    title = i.channel_name
 
                 line2add = f"{new_url},{title.strip()}\n"
                 with open(self.youtube_urls, 'a', encoding='utf-8') as f:
