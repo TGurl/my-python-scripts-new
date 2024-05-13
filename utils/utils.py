@@ -11,8 +11,7 @@ import time
 
 from colors import Colors
 from time import sleep
-from zipfile import ZipFile, ZIP_STORED
-
+from zipfile import ZipFile, ZIP_BZIP2, ZIP_LZMA, ZIP_STORED
 
 class TransgirlUtils:
     def __init__(self):
@@ -212,7 +211,18 @@ class TransgirlUtils:
         data.sort()
         return data
 
-    def zipper(self, path, length=45, compresstype=ZIP_STORED):
+    def check_archive(self, archive_name):
+        self.default_message('Checking archive...')
+        with ZipFile(archive_name, 'r') as archive:
+            check = archive.testzip()
+        result = '%gOK%R' if not check else '%rNOT OK%R'
+        self.clear_lines()
+        self.default_message(f"%i{archive_name} is {result}")
+        if check:
+            self.drawline(65)
+            print(check)
+
+    def zipper(self, path, length=45, compresstype=ZIP_LZMA, check=True):
         start_time = time.time()
         archive_name = path + ".zip"
         if os.path.exists(archive_name):
@@ -220,7 +230,7 @@ class TransgirlUtils:
         data = glob.glob(os.path.join(path, "**"), recursive=True)
         total = len(data)
         perc = 0
-        self.main_step(f"Zipping %i{archive_name}%R")
+        self.main_step(f"Creating %i{archive_name}%R")
         with ZipFile(archive_name, 'w', compresslevel=9, compression=compresstype) as archive:
             for idx, entry in enumerate(data, start=0):
                 perc = idx * 100 // total
@@ -233,6 +243,8 @@ class TransgirlUtils:
         self.default_message(f"The size of {archive_name} is {size}.")
         time_taken = round(time.time() - start_time, 2)
         self.default_message(f"Archiving took {time_taken} seconds.")
+        if check:
+            self.check_archive(archive_name)
 
     def unzipper(self, path, target_folder, length=45):
         size = self.convert_size(os.stat(path).st_size)
