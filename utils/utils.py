@@ -11,7 +11,7 @@ import time
 
 from colors import Colors
 from time import sleep
-from zipfile import ZipFile, ZIP_BZIP2, ZIP_LZMA, ZIP_STORED
+from zipfile import ZipFile, ZIP_LZMA
 
 class TransgirlUtils:
     def __init__(self):
@@ -95,10 +95,10 @@ class TransgirlUtils:
     def default_message(self, message, dot='·', new_line=False):
         self.printr(f"%g{dot}%R {message}", new_line=new_line)
 
-    def main_step(self, message, dot='==>', new_line=False):
+    def main_step(self, message, dot='>', new_line=False):
         self.printr(f"%g{dot}%R {message}", new_line=new_line)
 
-    def sub_step(self, message, dot='-->', new_line=False, spaces=4):
+    def sub_step(self, message, dot='└>', new_line=False, spaces=2):
         sp = spaces * ' '
         self.printr(f"{sp}%b{dot}%R {message}", new_line=new_line)
 
@@ -238,7 +238,7 @@ class TransgirlUtils:
                 self.sub_step(f"[{perc:3}%] adding {fn}")
                 archive.write(entry)
                 self.clear_lines()
-        self.clear_lines()
+        self.clear_lines(number=2)
         size = self.convert_size(os.stat(archive_name).st_size)
         self.default_message(f"The size of {archive_name} is {size}.")
         time_taken = round(time.time() - start_time, 2)
