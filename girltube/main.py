@@ -9,12 +9,12 @@ class GirlTube(GirlTubeCore):
 
     def run(self, args):
         self.unlock = args.unlock
-        self.check_lock()
-        self.lock_girltube()
+        #self.check_lock()
+        #self.lock_girltube()
         self.preflight_check()
         self.start_oldest = not args.latest
         self.continue_last = args.continuelast
-        self.start_small = args.small
+        self.start_small = not args.large
         self.fullscreen = args.fullscreen
 
         if args.add:
@@ -59,9 +59,9 @@ if __name__ == "__main__":
                         required=False,
                         help='unlock girltube')
 
-    egroup.add_argument('-s', '--small',
+    egroup.add_argument('-lm', '--large',
                         action='store_true',
-                        help='start in a small window')
+                        help='enable large mode')
 
     egroup.add_argument('-fs', '--fullscreen',
                         action='store_true',

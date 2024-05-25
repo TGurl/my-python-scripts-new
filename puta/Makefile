@@ -1,5 +1,5 @@
 FLAG = --onefile
-APPNAME = lifeplay
+APPNAME = puta
 
 install: build move clean
 
@@ -19,4 +19,4 @@ uninstall:
 	@rm ~/.bin/$(APPNAME)
 
 edit:
-	nvim -p main.py lifeplaycore.py utils.py colors.py
+	nvim -p main.py putacore.py utils.py colors.py

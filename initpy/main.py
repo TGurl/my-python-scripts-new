@@ -51,7 +51,9 @@ class InitPy():
         filename = os.path.join(self.cur_dir, 'pyrightconfig.json')
         if not os.path.exists(filename):
             self.step_title('writing pyrightconfig.json')
-            data = {'executionEnvironments' : [{ 'root': '.'}]}
+            data = {'executionEnvironments' : [{ 'root': '.'}],
+                    'typeCheckingMode' : 'strict',
+                    'reportMissingModuleSource' : 'none'}
             with open(filename, 'w', encoding='utf-8') as json_file:
                 json.dump(data, json_file)
         else:

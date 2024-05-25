@@ -13,6 +13,7 @@ from colors import Colors
 from time import sleep
 from zipfile import ZipFile, ZIP_LZMA
 
+
 class TransgirlUtils:
     def __init__(self):
         self.initialize()
@@ -29,8 +30,7 @@ class TransgirlUtils:
                    'I want to be raped!',
                    'I am just a dumb cumdump!',
                    'I want to be a free use whore!',
-                   'I want to suck a huge =====)',
-        ]
+                   'I want to suck a huge =====)',]
         return random.choice(slogans)
 
     def get_fucked(self, seconds=2.5):
@@ -69,7 +69,7 @@ class TransgirlUtils:
 
     def error_message(self, message, dot='·'):
         self.printr(f"%r{dot}%R {message}")
-    
+
     def ask_yes_no(self, message, default_yes=True, dot='·'):
         prompt = '(Y/n)' if default_yes else '(y/N)'
         msg = self.colorize(f"%g{dot}%R {message} {prompt} : ")
