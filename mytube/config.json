@@ -1,0 +1,13 @@
+{
+  "cats": {"1": "mom_vlogs", "2": "trad_wives", "3": "inspirational"},
+  "mom_vlogs": [
+    {"title": "This Mamas House", "url": "https://www.youtube.com/@ThisMamasHouse"},
+    {"title": "Celest Rayanne", "url": "https://www.youtube.com/@CelestRayanneMann"},
+  ],
+  "trad_wives": [
+    {"title": "Estee Williams", "url": "https://www.youtube.com/@EsteeWilliams"},
+  ],
+  "inspirational": [
+    {"title": "Fiercely Feminine", "url": "https://www.youtube.com/@fiercely.feminine"},
+  ]
+}

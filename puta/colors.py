@@ -1,1 +1,1 @@
-/data/dev/python/utils/colors.py
+../utils/colors.py

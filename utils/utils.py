@@ -33,10 +33,10 @@ class TransgirlUtils:
                    'I want to suck a huge =====)',]
         return random.choice(slogans)
 
-    def get_fucked(self, seconds=2.5):
+    def get_fucked(self, seconds: float =2.5):
         time.sleep(seconds)
 
-    def colorize(self, text, remove_colors=False):
+    def colorize(self, text: str, remove_colors:bool=False) -> str:
         for color in Colors.colors:
             replacement = '' if remove_colors else color[1]
             text = text.replace(color[0], replacement)
