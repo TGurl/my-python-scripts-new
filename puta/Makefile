@@ -27,4 +27,4 @@ uninstall:
 	@echo "UNINSTALL: Done";
 
 edit:
-	nvim -p main.py
+	nvim -p main.py core.py
