@@ -267,6 +267,16 @@ class TransgirlUtils:
         self.clear_lines()
         self.default_message(f"Unzipping %i{filename} ({size})%R done.", dot='✓')
 
+    def print_format_table(self):
+        for style in range(8):
+            for fg in range(30, 38):
+                s1 = ''
+                for bg in range(40, 48):
+                    format = ";".join([str(style), str(fg), str(bg)])
+                    s1 += '\x1b[%sm %s \x1b[0m' % (format, format)
+                print(s1)
+            print('\n')
+
     # -- keep this one last because of stupid editor thingie
     def clear_lines(self, number=1):
         for _ in range(number):
