@@ -69,6 +69,9 @@ class Puta(Core):
         # -- check if user wants to add a game
         if '-a' in args:
             args.remove('-a')
+            if not args:
+                self.show_help(error='No folder to process...')
+
             self.create_archive(args[0])
 
         self.install_a_game()
