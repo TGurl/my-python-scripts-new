@@ -19,4 +19,4 @@ uninstall:
 	@rm ~/.bin/$(APPNAME)
 
 edit:
-	nvim -p main.py addgames.py installgames.py core.py colors.py config.py
+	nvim -p main.py core.py config.py progressbar.py
