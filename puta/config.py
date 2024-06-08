@@ -3,8 +3,8 @@ from zipfile import ZIP_DEFLATED
 
 class Config:
     title = 'Puta'
-    version = '0.1a'
-    build = '20240607'
+    version = '0.1f'
+    build = '20240608'
     width = 20
     lorefolder = os.path.join('/', 'lore', 'sexgames')
     donefolder = os.path.join('/', 'lore', 'sexgames', 'done')

@@ -3,12 +3,11 @@ import sys
 import glob
 import shutil
 import time
-import fnmatch
 import math
 
 from config import Config
 from progressbar import ProgressBar
-from zipfile import ZipFile, ZIP_LZMA, ZIP_DEFLATED, ZIP_BZIP2
+from zipfile import ZipFile, ZIP_LZMA, ZIP_DEFLATED, ZIP_BZIP2, is_zipfile
 from pyfzf.pyfzf import FzfPrompt
 
 
@@ -17,13 +16,13 @@ class Core:
     # -- Design notes:
     # --     + a basic interface, nothing fancty like colors etc.
     # --     + prefer sys.argv over argparse, and make it work :)
-    # --     - clean up trash, ren'py save files, rpgm save files
+    # --     + clean up trash, ren'py save files, rpgm save files
     # --     + multiple locations: lore, usb, and finished!
     # --     + check all possible locations before zipping
     # --     - what ever else I can think off
     # ------------------------------------------------------------------------
-    def __init__(self):
-        pass
+    #def __init__(self):
+    #    pass
 
     # ------------------------------------------------------------------------
     # -- main functions
@@ -32,17 +31,15 @@ class Core:
         repos = [Config.lorefolder, Config.usbfolder, Config.donefolder]
         games = []
         for repo in repos:
-            if Config.query:
-                for file in os.listdir(repo):
-                    if fnmatch.fnmatch(file.lower(), f"*{Config.query}*"):
-                        games.append(os.path.join(repo, file))
-            else:
-                archives = glob.glob(os.path.join(repo, '**.zip'))
-                games.extend(archives)
+            for file in os.scandir(repo):
+                q = Config.query.lower()
+                if '.zip' in file.name.lower() and q in file.path.lower():
+                    games.append(file.path)
+        games.sort()
         chosen = FzfPrompt().prompt(games, '--exact --reverse --multi')
         if not chosen:
             self.banner()
-            self.print("> You really don't want to play a game?")
+            self.print("You really don't want to get fucked?")
             sys.exit()
         chosen.sort()
         return chosen
@@ -60,7 +57,24 @@ class Core:
                 self.print(f'> {foldername} already exists, skipping...')
                 time.sleep(1.5)
                 continue
-            self.unzip(entry)
+            
+            if is_zipfile(entry):
+                self.unzip(entry)
+            else:
+                self.print(f"> {entry} is not a zip archive!")
+                while True:
+                    ans = input("> Want me to remove her? (Y/n) : ").lower()
+                    if ans in "yn" or ans=='':
+                        remove = ans == 'y' or ans == ''
+                        break
+                    else:
+                        self.print("That's not an answer to my question...")
+                        time.sleep(1.5)
+                        self.clearlines(num=2)
+                if remove:
+                    os.remove(entry)
+                self.clearlines()
+
             if Config.delete:
                 os.remove(entry)
 
@@ -105,6 +119,7 @@ class Core:
     def create_archive(self, folder:str):
         self.banner()
         self.check_repos(folder)
+        self.tprint('Packing up', folder)
         self.tprint('Destination', Config.destination)
         self.show_compression_level()
         self.clear_trash(folder)
@@ -229,7 +244,14 @@ class Core:
 
         target.close()
         source.close()
+        self.do_sync()
         os.remove(archive)
+
+    def do_sync(self, width:int = Config.width):
+        template = "> {:" + str(width) + "}: "
+        self.wait_start(template.format('Syncing'))
+        os.system('sync')
+        self.wait_done('Done')
 
     # ------------------------------------------------------------------------
     # -- ZIP functions
