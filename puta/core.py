@@ -158,14 +158,15 @@ class Core:
     def banner(self, cls=True, char='-', split=' · '):
         if cls:
             os.system('clear')
-        d = 2 * char
-        banner = f"{d} {Config.title} {Config.version}{split}"
-        banner += f"Transgirl Coding Studios{split}{Config.build} {d}"
-        line = len(banner) * char
+        s = 2 * ' '
+        chars = ['┌', '┐', '└',  '┘', '─', '│']
+        banner = f"{chars[5]}{s}{Config.title} {Config.version}{split}"
+        banner += f"Transgirl Coding Studios{split}{Config.build}{s}{chars[5]}"
+        line = (len(banner) - 2) * chars[4]
         
-        self.print(line)
+        self.print(chars[0] + line + chars[1])
         self.print(banner)
-        self.print(line, cr=False)
+        self.print(chars[2] + line + chars[3], cr=False)
 
     def show_compression_level(self):
         prompt = ('Compression level')

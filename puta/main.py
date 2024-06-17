@@ -5,11 +5,11 @@ from core import Core, Config
 
 class Puta(Core):
     def show_help(self, error=''):
-        spc = 4 * ' '
+        spc = 5 * ' '
         end = '\n\n' if error else '\n'
         self.banner()
-        print('Usage: puta [-a <folder>] [switches]', end='\n\n')
-        print('Switches:')
+        print(' Usage: puta [-a <folder>] [switches]', end='\n\n')
+        print(' Switches:')
         print(f'{spc}-d{spc}delete archive after extraction')
         print(f'{spc}-u{spc}store archive to USB')
         print(f'{spc}-f{spc}finishe game, store in DONE')

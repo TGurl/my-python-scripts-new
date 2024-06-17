@@ -1,5 +1,5 @@
 class Colors:
-    reset  = "\033[0m"
+    reset  = "\x1b[0m"
     black  = "\x1b[0;30;40m"
     red    = "\x1b[0;31;40m"
     green  = "\x1b[0;32;40m"
