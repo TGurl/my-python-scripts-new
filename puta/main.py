@@ -4,6 +4,9 @@ from core import Core, Config
 
 
 class Puta(Core):
+    def __init__(self):
+        super().__init__()
+
     def show_help(self, error=''):
         spc = 5 * ' '
         end = '\n\n' if error else '\n'

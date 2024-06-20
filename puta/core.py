@@ -21,8 +21,9 @@ class Core:
     # --     + check all possible locations before zipping
     # --     - what ever else I can think off
     # ------------------------------------------------------------------------
-    #def __init__(self):
-    #    pass
+    def __init__(self):
+        self.empty = '.'
+        self.symbol = '>'
 
     # ------------------------------------------------------------------------
     # -- main functions
@@ -106,6 +107,7 @@ class Core:
 
         if trash:
             progress = ProgressBar(len(trash), width=Config.width,
+                                   symbol=self.symbol, empty=self.empty,
                                    fmt=ProgressBar.PUTA_CLN)
             for i, item in enumerate(trash):
                 progress.current = i
@@ -230,6 +232,7 @@ class Core:
         target = open(target_fn, 'wb')
 
         progress = ProgressBar(source_size, width=Config.width,
+                               symbol=self.symbol, empty=self.empty,
                                fmt=ProgressBar.PUTA_MOVE)
         while True:
             chunk = source.read(32768)
@@ -305,6 +308,7 @@ class Core:
 
 
         progress = ProgressBar(total, width=Config.width,
+                               symbol=self.symbol, empty=self.empty,
                                fmt=ProgressBar.PUTA)
         with ZipFile(archive, mode='w', compression=Config.compress) as zf:
             for i, entry in enumerate(files, start=1):
@@ -321,6 +325,7 @@ class Core:
             total = len(filelist)
 
             progresszip = ProgressBar(total, width=Config.width,
+                                      symbol=self.symbol, empty=self.empty,
                                       fmt=ProgressBar.PUTA_ZIP)
             for i, entry in enumerate(filelist):
                 progresszip.current = i
