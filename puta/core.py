@@ -22,8 +22,8 @@ class Core:
     # --     - what ever else I can think off
     # ------------------------------------------------------------------------
     def __init__(self):
-        self.empty = '.'
-        self.symbol = '>'
+        self.empty = ' '
+        self.symbol = '≡'
 
     # ------------------------------------------------------------------------
     # -- main functions
