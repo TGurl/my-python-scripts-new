@@ -62,6 +62,7 @@ class Core:
             self.fprint('Showing video', '')
             video = os.path.join(self.video_folder, self.video_filename)
             opts = '--really-quiet --volume=90' if self.quiet else '--volume=100'
+            opts += ' --geometry=800x450'
             cmd = f"mpv {opts} {video}"
             self.run(cmd)
             if self.quiet:

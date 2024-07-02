@@ -95,6 +95,7 @@ class WallGirlCore(TransgirlUtils):
         images = self.collect_wallpapers()
         self.current = random.choice(images)
         self.set_wallpaper(self.current)
+        self.change_grub_wallpaper()
         self.save_config()
 
     def change_grub_wallpaper(self):

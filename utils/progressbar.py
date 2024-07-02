@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
+import os
 import re
 import sys
 import math
@@ -54,13 +55,13 @@ class ProgressBar:
         size = int(self.width * percent)
         remaining = self.total - self.current
         bar = '[' + self.symbol * size + self.empty * (self.width - size) + ']'
-       
+
         args = {
             'total': self.total,
             'bar': bar,
             'current': self.current,
             'percent': percent * 100,
-            'remaining': remaining
+            'remaining': remaining,
         }
         print('\r' + self.fmt % args, file=self.output, end='')
     

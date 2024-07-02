@@ -24,6 +24,7 @@ class Core:
     def __init__(self):
         self.empty = ' '
         self.symbol = '≡'
+        self.filename = ''
 
     # ------------------------------------------------------------------------
     # -- main functions
@@ -314,6 +315,7 @@ class Core:
             for i, entry in enumerate(files, start=1):
                 zf.write(entry)
                 progress.current = i
+                self.filename = entry
                 progress()
             progress.done()
         self.clearlines()

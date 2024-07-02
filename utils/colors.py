@@ -8,11 +8,13 @@ class Colors:
     purple = "\x1b[0;35;40m"
     cyan   = "\x1b[0;36;40m"
     white  = "\x1b[0;37;40m"
+    gray   = "\x1b[0;37;0m"
     italic = "\x1B[3m"
 
     colors = [
             ('%R', reset),
             ('%B', black),
+            ('%G', gray),
             ('%r', red),
             ('%g', green),
             ('%y', yellow),

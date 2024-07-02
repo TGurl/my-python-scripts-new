@@ -46,6 +46,12 @@ if __name__ == '__main__':
                         required=False,
                         help='Filename to save video as')
     
+    #parser.add_argument('-l', '--list',
+    #                    type=str,
+    #                    metavar='<filename>',
+    #                    required=False,
+    #                    help='Text file with urls to download')
+    
     group.add_argument('-c', '--clean',
                         action='store_true',
                         required=False,
