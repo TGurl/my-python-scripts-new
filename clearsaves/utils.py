@@ -1,84 +1,91 @@
-#!/usr/bin/env python
 import os
-import sys
+import shutil
 
 from colors import Colors
 
 
-class TransgirlUtils:
+class Core:
     def __init__(self):
-        self.initialize()
+        self.colors = Colors.colors
+        self.renpy_folder = os.path.expanduser(os.path.join('~', '.renpy'))
+        self.exec_folder = os.path.expanduser(os.path.join('~', 'Downloads', 'Renpy'))
+        self.mygames_folder = os.path.expanduser(os.path.join('~', 'Dev', 'renpy', 'my_games'))
 
-    def initialize(self):
-        self.twidth = os.get_terminal_size().columns
 
-    def colorize(self, text, remove_colors=False):
-        for color in Colors.colors:
-            replacement = '' if remove_colors else color[1]
-            text = text.replace(color[0], replacement)
-        return text
+    # ------------------------------------------------------------------------
+    # --------------------------------------------------------------- FILE I/O
+    # ------------------------------------------------------------------------
+    def collect_files(self, folder):
+        files = []
+        for item in os.listdir(folder):
+            files.append(item)
+        return files
+    
+    def clear_save_files(self):
+        skip = ['launcher-4', 'tokens']
+        self.tprint('Clearing save files  ', '')
+        files = self.collect_files(self.renpy_folder)
+        counter = 0
+        for file in files:
+            if file in skip:
+                continue
+            counter += 1
+            path = os.path.join(self.renpy_folder, file)
+            shutil.rmtree(path)
+        self.clearlines()
+        action = 'Done' if counter else 'Not Needed'
+        self.tprint('Clearing save files  ', action)
 
-    def printr(self, message, new_line=False):
-        newline = '\n\n' if new_line else '\n'
-        message = self.colorize(message)
-        print(message, end=newline)
+    def clear_cache_files(self):
+        self.tprint('Clearing cache files ', '')
+        versions = self.collect_files(self.exec_folder)
+        counter = 0
+        for version in versions:
+            path = os.path.join(self.exec_folder, version)
+            folders = self.collect_files(os.path.join(path))
+            for folder in folders:
+                if folder == 'tmp' or 'dists' in folder:
+                    full_path = os.path.join(path, folder)
+                    shutil.rmtree(full_path)
+                    counter += 1
+        self.clearlines()
+        action = 'Done' if counter else 'Not Needed'
+        self.tprint('Clearing cache files ', action)
 
-    def cprint(self, message, width=0, new_line=False):
-        if not width:
-            width = self.twidth
-        temp = self.colorize(message, remove_colors=True)
-        message = self.colorize(message)
-        spaces = (width - len(temp)) // 2 * ' '
-        self.printr(f"{spaces}{message}", new_line=new_line)
+    def clear_dist_files(self):
+        self.tprint('Clearing dev files   ', '')
+        counter = 0
 
-    def drawline(self, width=0, color='%c'):
-        if not width:
-            width = self.twidth
-        line = width * '─'
-        self.printr(f"{color}{line}%R")
+        folders = self.collect_files(self.mygames_folder)
+        for folder in folders:
+            if not 'dists' in folder:
+                continue
+            path = os.path.join(self.mygames_folder, folder)
+            shutil.rmtree(path)
+            counter += 1
 
-    def arrow(self, message):
-        self.printr(f"  %b-->%R {message}")
+        self.clearlines()
+        action = 'Done' if counter else 'Not Needed'
+        self.tprint('Clearing dev files   ', action)
 
-    def error_message(self, message, exit_app=True, dot='·'):
-        self.printr(f"%r{dot}%R {message}")
-        if exit_app:
-            self.arrow("Exiting...")
-            sys.exit()
+    # ------------------------------------------------------------------------
+    # -------------------------------------------------------------- TUI Stuff
+    # ------------------------------------------------------------------------
+    def colorize(self, string, remove=False):
+        for color in self.colors:
+            repl = '' if remove else color[1]
+            string = string.replace(color[0], repl)
+        return string
 
-    def warning_message(self, message, dot='·'):
-        self.printr(f"%y{dot}%R {message}")
+    def mprint(self, string, nl=False):
+        end = '\n\n' if nl else '\n'
+        print(self.colorize(string), end=end)
 
-    def default_message(self, message, dot='·'):
-        self.printr(f"%g{dot}%R {message}")
+    def tprint(self, key, value, nl=False, template='- %(key)s: %(value)s'):
+        args = {'key': key, 'value': value}
+        text = template % args
+        self.mprint(text, nl=nl)
 
-    def banner(self, appname='APPNAME HERE', width=0, clear_screen=True):
-        if not appname:
-            self.error_message('No appname has been supplied.', exit_app=True)
-
-        if not width:
-            width = self.twidth
-
-        copyright = f"%y{appname.title()}%R - %bTransgirl Coding Studios 2024%R"
-        if clear_screen:
-            os.system('clear')
-        self.drawline(width=width)
-        self.cprint(copyright, width=width)
-        self.drawline(width=width)
-
-    def collect_items_in_folder(self, folder, extension=''):
-        data = []
-        for item in os.scandir(folder):
-            isdir = os.path.isdir(item.path)
-            if extension in item.name:
-                entry = [item.path, isdir]
-                data.append(entry)
-        data.sort()
-        return data
-
-    def show_items_in_folder(self, folder, extension=''):
-        data = self.collect_items_in_folder(folder=folder, extension=extension)
-        for entry in data:
-            file_color = '%g' if os.access(entry[0], os.X_OK) else '%r'
-            sign = '%bDIR %R' if entry[1] else f'{file_color}FILE%R'
-            self.printr(f"{sign} {entry[0]}")
+    def clearlines(self, nr=1):
+        for _ in range(nr):
+            print('\033[1A', end='\x1b[2K')

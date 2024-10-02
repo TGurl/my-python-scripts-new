@@ -23,7 +23,9 @@ class Core:
     # ------------------------------------------------------------------------
     def __init__(self):
         self.empty = ' '
-        self.symbol = '≡'
+        # self.symbol = '≡'
+        #self.symbol = '■'
+        self.symbol = '='
         self.filename = ''
 
     # ------------------------------------------------------------------------
@@ -56,7 +58,7 @@ class Core:
             foldername = filename.replace('.zip', '')
             self.tprint(f'Processing {i}/{total}', filename)
             if os.path.exists(os.path.join(Config.playfolder, foldername)):
-                self.print(f'> {foldername} already exists, skipping...')
+                self.print(f' > {foldername} already exists, skipping...')
                 time.sleep(1.5)
                 continue
             
@@ -65,7 +67,7 @@ class Core:
             else:
                 self.print(f"> {entry} is not a zip archive!")
                 while True:
-                    ans = input("> Want me to remove her? (Y/n) : ").lower()
+                    ans = input(" > Want me to remove her? (Y/n) : ").lower()
                     if ans in "yn" or ans=='':
                         remove = ans == 'y' or ans == ''
                         break
@@ -81,8 +83,8 @@ class Core:
                 os.remove(entry)
 
         self.clearlines(num=2)
-        self.print(f"> Finished procesing {total} games")
-        self.print(f"> Happy fapping!")
+        self.print(f" > Finished procesing {total} games")
+        self.print(f" > Happy fapping!")
         sys.exit()
 
     def clear_trash(self, folder:str):
@@ -141,7 +143,7 @@ class Core:
         print(string, end=end)
 
     def tprint(self, string:str, value:str, width:int = Config.width):
-        template = "> {:" + str(width) + "}: {}"
+        template = " > {:" + str(width) + "}: {}"
         self.print(template.format(string, value))
 
     def wait_start(self, string: str, output=sys.stderr):
@@ -212,9 +214,9 @@ class Core:
                 os.remove(os.path.join(entry, archive))
         elif found and not Config.delete:
             pronounce = 'her' if len(found) == 1 else 'them'
-            self.print(f"> Archive {archive} found in:")
+            self.print(f" > Archive {archive} found in:")
             for entry in found:
-                self.print(f"  - {entry}")
+                self.print(f"   - {entry}")
         
             print()
             print(f'You can use the -d switch to delete {pronounce} first.')
@@ -253,7 +255,7 @@ class Core:
         os.remove(archive)
 
     def do_sync(self, width:int = Config.width):
-        template = "> {:" + str(width) + "}: "
+        template = " > {:" + str(width) + "}: "
         self.wait_start(template.format('Syncing'))
         os.system('sync')
         self.wait_done('Done')
@@ -282,7 +284,7 @@ class Core:
 
     def check_archive(self, folder: str, width:int = Config.width):
         archive = folder.replace(' ', '_') + '.zip'
-        template = "> {:" + str(width) + "}: "
+        template = " > {:" + str(width) + "}: "
         with ZipFile(archive, mode='r', compression=Config.compress) as zf:
             self.wait_start(template.format('Checking archive'))
             if not zf.testzip():

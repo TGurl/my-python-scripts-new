@@ -27,11 +27,11 @@ class ProgressBar:
     """
     DEFAULT = 'Progress: %(bar)s %(percent)3d%%'
     FULL = '%(bar)s %(current)d/%(total)d (%(percent)3d%%) %(remaining)d to go'
-    PUTA = '> Archiving %(bar)s %(current)d/%(total)d (%(percent)3d%%)'
-    PUTA_MOVE = '> Moving %(bar)s (%(percent)3d%%)'
-    PUTA_INST = '> Installing %(bar)s %(current)d/%(total)d (%(percent)3d%%)'
-    PUTA_ZIP = '> Unzipping %(bar)s %(current)d/%(total)d (%(percent)3d%%)'
-    PUTA_CLN = '> Cleaning %(bar)s %(current)d/%(total)d (%(percent)3d%%) %(remaining)d to go'
+    PUTA = ' > Archiving %(bar)s %(current)d/%(total)d (%(percent)3d%%)'
+    PUTA_MOVE = ' > Moving %(bar)s (%(percent)3d%%)'
+    PUTA_INST = ' > Installing %(bar)s %(current)d/%(total)d (%(percent)3d%%)'
+    PUTA_ZIP = ' > Unzipping %(bar)s %(current)d/%(total)d (%(percent)3d%%)'
+    PUTA_CLN = ' > Cleaning %(bar)s %(current)d/%(total)d (%(percent)3d%%) %(remaining)d to go'
     
     def __init__(self, total, width=40, fmt=DEFAULT,
                  symbol='=', empty=' ', output=sys.stderr):
