@@ -22,10 +22,10 @@ class Core:
     # --     - what ever else I can think off
     # ------------------------------------------------------------------------
     def __init__(self):
-        self.empty = ' '
+        self.empty = '-'
         # self.symbol = '≡'
         #self.symbol = '■'
-        self.symbol = '='
+        self.symbol = '#'
         self.filename = ''
 
     # ------------------------------------------------------------------------
